@@ -207,11 +207,16 @@ class Crypto
      */
     private static function decryptInternal($ciphertext, KeyOrPassword $secret, $raw_binary)
     {
-        RuntimeTests::runtimeTest();
+        //RuntimeTests::runtimeTest();
 
         if (! $raw_binary) {
             try {
-                $ciphertext = Encoding::hexToBin($ciphertext);
+                // This custom hex2bin implementation is very slow (~37ms in
+                // our tests).
+                // $ciphertext = Encoding::hexToBin($ciphertext);
+                // PHP's built-in implementation is more vulnerable to memory
+                // attacks but that's OK for this implementation.
+                $ciphertext = hex2bin($ciphertext);
             } catch (Ex\BadFormatException $ex) {
                 throw new Ex\WrongKeyOrModifiedCiphertextException(
                     'Ciphertext has invalid hex encoding.'
